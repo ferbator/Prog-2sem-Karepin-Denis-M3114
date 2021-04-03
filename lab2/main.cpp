@@ -139,24 +139,80 @@ public:
 
 ostream &operator<<(ostream &out, const CPolynomial &p) {
     if (!p.coe_table.empty()) {
-        for (int i = 0; i < p.coe_table.size() - 1; i++) {
-            if (p.coe_table[i] != 0) {
-                if (i == 0)
-                    out << p.coe_table[i] << " + ";
-                else if (i == 1)
-                    out << p.coe_table[i] << "x + ";
-                else if (p.coe_table[i] == 1)
-                    out << "x^" << i << " + ";
-                else if (p.coe_table[i + 1] >= 0)
-                    out << p.coe_table[i] << "x^" << i << " + ";
+        int tmp = p.coe_table.size() - 1;
+
+        if (tmp == 0)                                                                       // tmp == 0
+            out << p.coe_table[tmp];
+        else if (tmp == 1) {                                                                // tmp == 1
+            if (p.coe_table[tmp] > 0)
+                if (p.coe_table[tmp] != 1)
+                    out << p.coe_table[tmp] << "x";
                 else
-                    out << p.coe_table[i] << "x^" << i << " ";
+                    out << "x";
+            else if (p.coe_table[tmp] < 0)
+                if (p.coe_table[tmp] != -1)
+                    out << p.coe_table[tmp] << "x";
+                else
+                    out << "-x";
+            if (p.coe_table[tmp - 1] > 0)
+                out << " + " << p.coe_table[tmp - 1];
+            else if (p.coe_table[tmp - 1] < 0)
+                out << " - " << abs(p.coe_table[tmp - 1]);
+        } else if (tmp == 2) {                                                              // tmp == 2
+            if (p.coe_table[tmp] > 0)
+                if (p.coe_table[tmp] != 1)
+                    out << p.coe_table[tmp] << "x^" << tmp;
+                else
+                    out << "x^" << tmp;
+            else if (p.coe_table[tmp] < 0)
+                if (p.coe_table[tmp] != -1)
+                    out << p.coe_table[tmp] << "x^" << tmp;
+                else
+                    out << "-x^" << tmp;
+
+            if (p.coe_table[tmp - 1] > 0)
+                if (p.coe_table[tmp - 1] != 1)
+                    out << " + " << p.coe_table[tmp - 1] << "x";
+                else
+                    out << " + " << "x";
+            else if (p.coe_table[tmp - 1] < 0)
+                if (p.coe_table[tmp - 1] != -1)
+                    out << " - " << abs(p.coe_table[tmp - 1]) << "x";
+                else
+                    out << " - x";
+            if (p.coe_table[tmp - 2] > 0)
+                out << " + " << p.coe_table[tmp - 2];
+            else if (p.coe_table[tmp - 2] < 0)
+                out << " - " << abs(p.coe_table[tmp - 2]);
+        } else {
+            for (int i = p.coe_table.size() - 1; i > 1; i--) {
+                if (p.coe_table[i] != 0) {
+                    if (p.coe_table[i] > 0)
+                        if (p.coe_table[i] != 1)
+                            out << p.coe_table[i] << "x^" << i << " + ";
+                        else
+                            out << "x^" << i << " + ";
+                    else if (p.coe_table[i] != -1)
+                        out << '(' << p.coe_table[i] << ')' << "x^" << i << " + ";
+                    else
+                        out << "(-1)x^" << i << " + ";
+                }
             }
+            if (p.coe_table[1] > 0)
+                if (p.coe_table[1] != 1)
+                    out << p.coe_table[1] << "x";
+                else
+                    out << "x";
+            else if (p.coe_table[1] < 0)
+                if (p.coe_table[1] != -1)
+                    out << '(' << p.coe_table[1] << ")x";
+                else
+                    out << " (-1)x";
+            if (p.coe_table[0] > 0)
+                out << " + " << p.coe_table[0];
+            else if (p.coe_table[0] < 0)
+                out << " - " << abs(p.coe_table[0]);
         }
-        if (p.coe_table[p.coe_table.size() - 1] == 1)
-            out << "x^" << p.coe_table.size() - 1 << "\n";
-        else
-            out << p.coe_table[p.coe_table.size() - 1] << "x^" << p.coe_table.size() - 1 << "\n";
     } else
         out << 0 << "\n";
     return out;
@@ -207,11 +263,11 @@ istream &operator>>(istream &in, CPolynomial &p) {
 int main() {
     CPolynomial l, k, sum, dif;
     cin >> l;
-    cin >> k;
-    //l *= 3;
-    sum = k + l;
-    cout << sum;
-    dif = l - k;
-    cout << dif;
+    /*cin >> k;
+    l *= 3;
+    sum = k + l;*/
+    cout << l;
+    /*dif = l - k;
+    cout << dif;*/
     return 0;
 }
