@@ -30,23 +30,19 @@ public:
 
     friend ostream &operator<<(ostream &out, const CPolynomial &p);
 
-    friend CPolynomial operator*(const CPolynomial &p1, const CPolynomial &p2) {
+    friend CPolynomial operator*(const CPolynomial &ths, const CPolynomial &rhs) {
         CPolynomial new_p;
-        int sum_power;
-        for (int i = 0; i < p1.coe_table.size(); ++i) {
-            for (int j = 0; j < p2.coe_table.size(); ++j) {
-                sum_power = i + j;
-                if (sum_power >= new_p.coe_table.size()) {
-                    new_p.coe_table.resize(sum_power + 1);
-                }
-                new_p.coe_table[sum_power] += p1.coe_table[i] * p2.coe_table[j];
-            }
-        }
+        new_p.coe_table.resize(ths.coe_table.size() + rhs.coe_table.size() + 1);
+        for (int i = 0; i < ths.coe_table.size(); ++i)
+            for (int j = 0; j < rhs.coe_table.size(); ++j)
+                new_p.coe_table[i + j] += ths.coe_table[i] * rhs.coe_table[j];
+
         return new_p;
     }
 
-    void operator*=(const CPolynomial &other) {
+    CPolynomial &operator*=(const CPolynomial &other) {
         *this = *this * other;
+        return *this;
     }
 
     friend CPolynomial operator*(const CPolynomial &p1, double digit) {
@@ -58,8 +54,9 @@ public:
         return new_p;
     }
 
-    void operator*=(double digit) {
+    CPolynomial &operator*=(double digit) {
         *this = *this * digit;
+        return *this;
     }
 
     CPolynomial &operator=(const CPolynomial &other) {
@@ -69,9 +66,10 @@ public:
         return *this;
     }
 
-    void operator/=(float digit) {
+    CPolynomial &operator/=(float digit) {
         for (int i = 0; i < this->coe_table.size(); i++)
             this->coe_table[i] /= digit;
+        return *this;
     }
 
     friend CPolynomial operator+(const CPolynomial &ths, const CPolynomial &rhs) {
@@ -92,8 +90,9 @@ public:
         return new_p;
     }
 
-    void operator+=(const CPolynomial &other_p) {
+    CPolynomial &operator+=(const CPolynomial &other_p) {
         *this = *this + other_p;
+        return *this;
     }
 
     friend CPolynomial operator-(const CPolynomial &ths, const CPolynomial &rhs) {
@@ -102,8 +101,9 @@ public:
         return new_p;
     }
 
-    void operator-=(const CPolynomial &other) {
+    CPolynomial &operator-=(const CPolynomial &other) {
         *this = *this - other;
+        return *this;
     }
 
     CPolynomial operator-() const {
@@ -129,8 +129,8 @@ public:
         return !(ths == rhs);
     }
 
-    float operator[](const int i) {
-        return coe_table[i - 1];
+    float operator[](const int i) const {
+        return this->coe_table[i - 1];
     }
 
     ~CPolynomial() {};
@@ -139,12 +139,23 @@ public:
 ostream &operator<<(ostream &out, const CPolynomial &p) {
     if (!p.coe_table.empty()) {
         for (int i = 0; i < p.coe_table.size() - 1; i++) {
-            if (p.coe_table[i + 1] >= 0)
-                out << p.coe_table[i] << "x^" << i << " +";
-            else
-                out << p.coe_table[i] << "x^" << i << " ";
+            if (p.coe_table[i] != 0) {
+                if (i == 0)
+                    out << p.coe_table[i] << " + ";
+                else if (i == 1)
+                    out << p.coe_table[i] << "x + ";
+                else if (p.coe_table[i] == 1)
+                    out << "x^" << i << " + ";
+                else if (p.coe_table[i + 1] >= 0)
+                    out << p.coe_table[i] << "x^" << i << " + ";
+                else
+                    out << p.coe_table[i] << "x^" << i << " ";
+            }
         }
-        out << p.coe_table[p.coe_table.size() - 1] << "x^" << p.coe_table.size() - 1 << "\n";
+        if (p.coe_table[p.coe_table.size() - 1] == 1)
+            out << "x^" << p.coe_table.size() - 1 << "\n";
+        else
+            out << p.coe_table[p.coe_table.size() - 1] << "x^" << p.coe_table.size() - 1 << "\n";
     } else
         out << 0 << "\n";
     return out;
@@ -159,14 +170,13 @@ istream &operator>>(istream &in, CPolynomial &p) {
     unsigned power = 0;
     double digit = 0;
     int sign = 1;
-    bool is_coef = false;
-    bool was_x = false;
+    bool is_coef = false, was_x = false;
     for (int i = 0; i < str.size(); i++) {
         if (str[i] == '+' || str[i] == '-') {
             is_coef = false;
-            if (i != 0) {
+            if (i != 0)
                 CPolynomial::set_coefficients(was_x, power, digit, p, sign);
-            }
+
             digit = 0, power = 0;
             if (str[i] == '-') {
                 sign = -1;
