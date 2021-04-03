@@ -33,8 +33,8 @@ public:
     friend CPolynomial operator*(const CPolynomial &ths, const CPolynomial &rhs) {
         CPolynomial new_p;
         new_p.coe_table.resize(ths.coe_table.size() + rhs.coe_table.size() + 1);
-        for (int i = 0; i < ths.coe_table.size(); ++i)
-            for (int j = 0; j < rhs.coe_table.size(); ++j)
+        for (int i = 0; i < ths.coe_table.size(); i++)
+            for (int j = 0; j < rhs.coe_table.size(); j++)
                 new_p.coe_table[i + j] += ths.coe_table[i] * rhs.coe_table[j];
 
         return new_p;
@@ -48,7 +48,7 @@ public:
     friend CPolynomial operator*(const CPolynomial &p1, double digit) {
         CPolynomial new_p;
         new_p.coe_table.resize(p1.coe_table.size());
-        for (int i = 0; i < p1.coe_table.size(); ++i) {
+        for (int i = 0; i < p1.coe_table.size(); i++) {
             new_p.coe_table[i] = digit * p1.coe_table[i];
         }
         return new_p;
@@ -74,24 +74,25 @@ public:
 
     friend CPolynomial operator+(const CPolynomial &ths, const CPolynomial &rhs) {
         CPolynomial new_p;
-        int max_size_p = max(ths.coe_table.size(), rhs.coe_table.size());
-        new_p.coe_table.resize(max_size_p);
-        for (int i = 0; i < max_size_p; ++i) {
-            if (i >= min(ths.coe_table.size(), rhs.coe_table.size())) {
-                if (ths.coe_table.size() > rhs.coe_table.size()) {
-                    new_p.coe_table[i] = ths.coe_table[i];
-                } else {
-                    new_p.coe_table[i] = rhs.coe_table[i];
-                }
-            } else {
-                new_p.coe_table[i] = ths.coe_table[i] + rhs.coe_table[i];
-            }
-        }
+        new_p = ths;
+        new_p += rhs;
+
         return new_p;
     }
 
     CPolynomial &operator+=(const CPolynomial &other_p) {
-        *this = *this + other_p;
+
+        if (this->coe_table.size() >= other_p.coe_table.size())
+            for (int i = 0; i < other_p.coe_table.size(); i++)
+                this->coe_table[i] += other_p.coe_table[i];
+        else {
+            for (int i = 0; i < this->coe_table.size(); i++)
+                this->coe_table[i] += other_p.coe_table[i];
+
+            for (int i = this->coe_table.size(); i < other_p.coe_table.size(); i++)
+                this->coe_table.push_back(other_p.coe_table[i]);
+        }
+
         return *this;
     }
 
@@ -116,7 +117,7 @@ public:
         if (ths.coe_table.size() != rhs.coe_table.size()) {
             return false;
         } else {
-            for (int i = 0; i < ths.coe_table.size(); ++i) {
+            for (int i = 0; i < ths.coe_table.size(); i++) {
                 if (ths.coe_table[i] != rhs.coe_table[i]) {
                     return false;
                 }
@@ -208,7 +209,7 @@ int main() {
     cin >> l;
     cin >> k;
     //l *= 3;
-    sum = l + k;
+    sum = k + l;
     cout << sum;
     dif = l - k;
     cout << dif;
