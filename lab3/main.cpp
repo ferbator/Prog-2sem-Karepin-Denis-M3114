@@ -51,7 +51,9 @@ int main() {
     if (!result) {
         cout << "The file can't be opened" << endl;
     }
-    map<string, Stop> routes;
+    map<string, Stop> routesForBus;
+    map<string, Stop> routesForTrolleybus;
+    map<string, Stop> routesForTram;
 
     string tmp_routes;
     string tmp_coordinates;
@@ -74,24 +76,62 @@ int main() {
         for (auto &i : buff) {
 
             // парсинг вида транспорта ------------------------------------------
-            buff_class.view = tool.child("type_of_vehicle").child_value();
+            buff_class.view = (string) tool.child("type_of_vehicle").child_value();
             //-------------------------------------------------------------------
 
-            // парсинг координат ------------------------------------------------
-            tmp_coordinates = (string) tool.child("coordinates").child_value();
-            buff_class.coord.emplace_back(stod(tmp_coordinates.substr(0, 9)),
-                                          stod(tmp_coordinates.substr(10, 9)));
-            // ------------------------------------------------------------------
+            if (buff_class.view == "Автобус") {
+                // парсинг координат ------------------------------------------------
+                tmp_coordinates = (string) tool.child("coordinates").child_value();
+                buff_class.coord.emplace_back(stod(tmp_coordinates.substr(0, 9)),
+                                              stod(tmp_coordinates.substr(10, 9)));
+                // ------------------------------------------------------------------
 
-            const auto found = routes.find(i);
-            if (found != routes.cend()) {
-                routes[i].max_route++;
-                routes[i].coord.emplace_back(stod(tmp_coordinates.substr(0, 9)),
-                                             stod(tmp_coordinates.substr(10, 9)));
+                const auto found = routesForBus.find(i);
+                if (found != routesForBus.cend()) {
+                    routesForBus[i].max_route++;
+                    routesForBus[i].coord.emplace_back(stod(tmp_coordinates.substr(0, 9)),
+                                                       stod(tmp_coordinates.substr(10, 9)));
+                }
+                routesForBus.insert(make_pair(i, buff_class));
+
+                buff_class.clear();
             }
-            routes.insert(make_pair(i, buff_class));
 
-            buff_class.clear();
+            if (buff_class.view == "Трамвай") {
+                // парсинг координат ------------------------------------------------
+                tmp_coordinates = (string) tool.child("coordinates").child_value();
+                buff_class.coord.emplace_back(stod(tmp_coordinates.substr(0, 9)),
+                                              stod(tmp_coordinates.substr(10, 9)));
+                // ------------------------------------------------------------------
+
+                const auto found = routesForTram.find(i);
+                if (found != routesForTram.cend()) {
+                    routesForTram[i].max_route++;
+                    routesForTram[i].coord.emplace_back(stod(tmp_coordinates.substr(0, 9)),
+                                                        stod(tmp_coordinates.substr(10, 9)));
+                }
+                routesForTram.insert(make_pair(i, buff_class));
+
+                buff_class.clear();
+            }
+
+            if (buff_class.view == "Троллейбус") {
+                // парсинг координат ------------------------------------------------
+                tmp_coordinates = (string) tool.child("coordinates").child_value();
+                buff_class.coord.emplace_back(stod(tmp_coordinates.substr(0, 9)),
+                                              stod(tmp_coordinates.substr(10, 9)));
+                // ------------------------------------------------------------------
+
+                const auto found = routesForTrolleybus.find(i);
+                if (found != routesForTrolleybus.cend()) {
+                    routesForTrolleybus[i].max_route++;
+                    routesForTrolleybus[i].coord.emplace_back(stod(tmp_coordinates.substr(0, 9)),
+                                                              stod(tmp_coordinates.substr(10, 9)));
+                }
+                routesForTrolleybus.insert(make_pair(i, buff_class));
+
+                buff_class.clear();
+            }
         }
 
         buff.clear();
@@ -99,26 +139,50 @@ int main() {
 
 
     cout << setprecision(9);
+
     int max_bus = 0;
-    int max_trolleybus = 0;
-    int max_tram = 0;
-    for (auto it = routes.begin(); it != routes.end(); it++) {
-        if (it->second.view == "Автобус")
-            if (it->second.max_route > max_bus)
-                max_bus = it->second.max_route;
-        if (it->second.view == "Трамвай")
-            if (it->second.max_route > max_tram)
-                max_tram = it->second.max_route;
-        if (it->second.view == "Троллейбус")
-            if (it->second.max_route > max_trolleybus)
-                max_trolleybus = it->second.max_route;
-
-        cout << "Маршрут: <" << it->first << "> Транспорт: " << it->second.view << " Координаты: \n";
-        for (int i = 0; i < it->second.coord.size(); i++)
-            cout << it->second.coord[i].first << " " << it->second.coord[i].second << "\n";
-
-        cout << it->second.max_route << "\n";
+    string max_bus_rout;
+    for (auto it = routesForBus.begin(); it != routesForBus.end(); it++) {
+        if (it->second.max_route > max_bus) {
+            max_bus = it->second.max_route;
+            max_bus_rout = it->first;
+        }
     }
-    cout << max_bus << " " << max_trolleybus << " " << max_tram;
+    int max_tram = 0;
+    string max_tram_rout;
+    for (auto it = routesForTram.begin(); it != routesForTram.end(); it++) {
+        if (it->second.max_route > max_tram) {
+            max_tram = it->second.max_route;
+            max_tram_rout = it->first;
+        }
+
+    }
+    int max_trolleybus = 0;
+    string max_trolleybus_rout;
+    for (auto it = routesForTram.begin(); it != routesForTram.end(); it++) {
+        if (it->second.max_route > max_trolleybus) {
+            max_trolleybus = it->second.max_route;
+            max_trolleybus_rout = it->first;
+        }
+    }
+
+    cout << max_bus << "\n";
+    cout << "Маршрут: <" << max_bus_rout << "> Транспорт: " << routesForBus[max_bus_rout].view << " Координаты: \n";
+    for (int i = 0; i < routesForBus[max_bus_rout].coord.size(); i++)
+        cout << routesForBus[max_bus_rout].coord[i].first << " " << routesForBus[max_bus_rout].coord[i].second << "\n";
+
+    cout << max_trolleybus<< "\n";
+    cout << "Маршрут: <" << max_trolleybus_rout << "> Транспорт: " << routesForTrolleybus[max_trolleybus_rout].view
+         << " Координаты: \n";
+    for (int i = 0; i < routesForTrolleybus[max_trolleybus_rout].coord.size(); i++)
+        cout << routesForTrolleybus[max_trolleybus_rout].coord[i].first << " "
+             << routesForTrolleybus[max_trolleybus_rout].coord[i].second << "\n";
+
+    cout << max_tram<< "\n";
+    cout << "Маршрут: <" << max_tram_rout << "> Транспорт: " << routesForTram[max_tram_rout].view << " Координаты: \n";
+    for (int i = 0; i < routesForTram[max_tram_rout].coord.size(); i++)
+        cout << routesForTram[max_tram_rout].coord[i].first << " " << routesForTram[max_tram_rout].coord[i].second
+             << "\n";
+
     return 0;
 }
