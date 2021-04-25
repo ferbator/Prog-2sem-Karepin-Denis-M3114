@@ -9,7 +9,7 @@ using namespace std;
 
 using namespace pugi;
 
-#define M_PI 3.14159265358979323846;
+#define M_PI 3.1415926535;
 
 class Stop {
 public:
@@ -71,27 +71,34 @@ int main() {
             buff.push_back(tmp_routes.substr(pos, tmp_routes.size()));
         // ------------------------------------------------------------------
 
-        // парсинг координат ------------------------------------------------
-        tmp_coordinates = (string) tool.child("coordinates").child_value();
-        buff_class.coord.emplace_back(stod(tmp_coordinates.substr(0, 9)),
-                                      stod(tmp_coordinates.substr(10, 9)));
-        // ------------------------------------------------------------------
-
-        // парсинг вида транспорта ------------------------------------------
-        buff_class.view = tool.child("type_of_vehicle").child_value();
         for (auto &i : buff) {
-            const auto found = routes.find(i);
-            if (found != routes.cend())
-                routes[i].max_route++;
 
+            // парсинг вида транспорта ------------------------------------------
+            buff_class.view = tool.child("type_of_vehicle").child_value();
+            //-------------------------------------------------------------------
+
+            // парсинг координат ------------------------------------------------
+            tmp_coordinates = (string) tool.child("coordinates").child_value();
+            buff_class.coord.emplace_back(stod(tmp_coordinates.substr(0, 9)),
+                                          stod(tmp_coordinates.substr(10, 9)));
+            // ------------------------------------------------------------------
+
+            const auto found = routes.find(i);
+            if (found != routes.cend()) {
+                routes[i].max_route++;
+                routes[i].coord.emplace_back(stod(tmp_coordinates.substr(0, 9)),
+                                             stod(tmp_coordinates.substr(10, 9)));
+            }
             routes.insert(make_pair(i, buff_class));
+
+            buff_class.clear();
         }
-        buff_class.clear();
+
         buff.clear();
     }
 
 
-    cout << std::setprecision(9);
+    cout << setprecision(9);
     int max_bus = 0;
     int max_trolleybus = 0;
     int max_tram = 0;
@@ -106,8 +113,11 @@ int main() {
             if (it->second.max_route > max_trolleybus)
                 max_trolleybus = it->second.max_route;
 
-        cout << "Маршрут: <" << it->first << "> Транспорт: " << it->second.view << " Координаты: " <<
-             it->second.coord[0].second << " " << it->second.coord[0].first << " " << it->second.max_route << "\n";
+        cout << "Маршрут: <" << it->first << "> Транспорт: " << it->second.view << " Координаты: \n";
+        for (int i = 0; i < it->second.coord.size(); i++)
+            cout << it->second.coord[i].first << " " << it->second.coord[i].second << "\n";
+
+        cout << it->second.max_route << "\n";
     }
     cout << max_bus << " " << max_trolleybus << " " << max_tram;
     return 0;
