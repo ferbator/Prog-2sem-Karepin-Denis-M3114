@@ -20,7 +20,6 @@ public:
         max_route = 0;
     }
 
-
     double calc_dist(pair<double, double> &a, pair<double, double> &b) {
 
         double lat1 = a.first / 180 * M_PI;
@@ -85,11 +84,11 @@ void ParsXmlRoutes(map<string, CStop> &routes, const string &type_transport) {
         cout << "The file can't be opened" << endl;
     }
 
-
     string tmp_routes;
     string tmp_coordinates;
     vector<string> buff;
     CStop buff_class;
+    
     for (pugi::xml_node tool = doc.first_child().first_child(); tool; tool = tool.next_sibling()) {
         // парсинг номера маршрута ------------------------------------------
         tmp_routes = (string) tool.child("routes").child_value();
@@ -108,6 +107,7 @@ void ParsXmlRoutes(map<string, CStop> &routes, const string &type_transport) {
             // парсинг вида транспорта ------------------------------------------
             buff_class.view = (string) tool.child("type_of_vehicle").child_value();
             //-------------------------------------------------------------------
+            
             if (buff_class.view == type_transport) {
                 // парсинг координат ------------------------------------------------
                 tmp_coordinates = (string) tool.child("coordinates").child_value();
@@ -188,14 +188,14 @@ void ParsXmlStreet(map<string, int> &street) {
 
         }
     }
-    // ------------------------------------------------------------------
+        // ------------------------------------------------------------------
 }
 
 void print_map(map<string, CStop> a) {
     for (auto it = a.begin(); it != a.end(); it++) {
         cout << "<" << it->second.view << "> ==" << it->first << "== " << it->second.max_route << "\n";
-//        for (auto i:it->second.coord)
-//            cout << i.first << " " << i.second << "\n";
+          for (auto i:it->second.coord)
+            cout << i.first << " " << i.second << "\n";
     }
 }
 
