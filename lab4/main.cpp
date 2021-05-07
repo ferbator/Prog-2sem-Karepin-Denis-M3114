@@ -59,7 +59,6 @@ bool none_of(Iterator it_first, Iterator it_second, bool (&comp_func)(T, T)) {
         it_first++;
         if (comp_func(*prev(it_first), *it_first))
             return false;
-
     }
     return true;
 }
@@ -87,13 +86,46 @@ bool is_sorted(Iterator it_first, Iterator it_second, bool (&comp_func)(T, T)) {
     return true;
 }
 
+
+template<class Iterator, class T>
+bool is_partitioned() {
+
+}
+
+template<class Iterator, class T>
+T find_not(Iterator it_first, Iterator it_second, T elem) {
+    while (it_first != it_second) {
+        it_first++;
+        if (*prev(it_first) != elem)
+            return *prev(it_first);
+    }
+}
+
+template<class Iterator, class T>
+T find_backward(Iterator it_first, Iterator it_second, T elem) {
+    while (it_second != it_first) {
+        it_second--;
+        if (*next(it_first) == elem)
+            return *next(it_first);
+    }
+}
+
+template<class Iterator, class T>
+bool is_palindrome() {
+
+}
+
 int main() {
 
-    vector<int> vec = {1, 2, 3, 4};
+    vector<int> vec = {3, 3, 3, 2};
 
     cout << is_sorted(vec.begin(), vec.end(), my_greater<int>) << "\n";
 
-    cout << is_sorted(vec.begin(), vec.end(), my_less<int>);
+    cout << is_sorted(vec.begin(), vec.end(), my_less<int>) << "\n";
+
+    cout << find_not(vec.begin(), vec.end(), 3) << "\n";
+
+    cout << find_backward(vec.begin(), vec.end(), 3) << "\n";
 
     return 0;
 }
