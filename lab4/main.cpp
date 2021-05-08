@@ -1,6 +1,6 @@
 #include <iostream>
 #include <vector>
-#include<algorithm>
+#include <set>
 
 using namespace std;
 
@@ -31,48 +31,74 @@ bool my_less(type a, type b) {
     return false;
 }
 
+template<typename type>
+bool my_less_equal(type a, type b) {
+    if (a <= b)
+        return true;
+    return false;
+}
+
+template<typename type>
+bool my_equal_to(type a, type b) {
+    if (a == b)
+        return true;
+    return false;
+}
+
+template<typename type>
+bool my_parity(type a, type b) {
+    if ((a + b) % 2 == 0)
+        return true;
+    return false;
+}
+
 // место для алгоритмов
 
 template<class Iterator, class T>
-bool all_of(Iterator it_first, Iterator it_second, bool (&comp_func)(T, T)) {
+bool all_of(Iterator it_first, Iterator it_second, T elem, bool (&comp_func)(T, T)) {
     while (it_first != it_second) {
-        it_first++;
-        if (!comp_func(*prev(it_first), *it_first))
+        if (!comp_func(*it_first, elem))
             return false;
+
+        it_first++;
     }
     return true;
 }
 
 template<class Iterator, class T>
-bool any_of(Iterator it_first, Iterator it_second, bool (&comp_func)(T, T)) {
+bool any_of(Iterator it_first, Iterator it_second, T elem, bool (&comp_func)(T, T)) {
     while (it_first != it_second) {
-        it_first++;
-        if (comp_func(*prev(it_first), *it_first))
+        if (comp_func(*it_first, elem))
             return true;
+
+        it_first++;
     }
     return false;
 }
 
 template<class Iterator, class T>
-bool none_of(Iterator it_first, Iterator it_second, bool (&comp_func)(T, T)) {
+bool none_of(Iterator it_first, Iterator it_second, T elem, bool (&comp_func)(T, T)) {
     while (it_first != it_second) {
-        it_first++;
-        if (comp_func(*prev(it_first), *it_first))
+        if (comp_func(*it_first, elem))
             return false;
+
+        it_first++;
     }
     return true;
 }
 
 template<class Iterator, class T>
-bool one_of(Iterator it_first, Iterator it_second, bool (&comp_func)(T, T)) {
+bool one_of(Iterator it_first, Iterator it_second, T elem, bool (&comp_func)(T, T)) {
     int count = 0;
     while (it_first != it_second) {
-        it_first++;
-        if (!comp_func(*prev(it_first), *it_first))
+        if (!comp_func(*it_first, elem))
             count++;
-        if (count == 1)
-            return true;
+
+        it_first++;
     }
+    if (count == 1)
+        return true;
+
     return false;
 }
 
@@ -86,38 +112,91 @@ bool is_sorted(Iterator it_first, Iterator it_second, bool (&comp_func)(T, T)) {
     return true;
 }
 
-
 template<class Iterator, class T>
-bool is_partitioned() {
+bool is_partitioned(Iterator it_first, Iterator it_second, T A, bool (&comp_func)(T, T)) {
+    int count = 0;
+    if (comp_func(*it_first, A)) {
+        while (it_first != it_second && comp_func(*it_first, A))
+            it_first++;
 
+        if (it_first == it_second)
+            return false;
+
+        while (it_first != it_second) {
+            if (comp_func(*it_first, A))
+                return false;
+            it_first++;
+            count++;
+        }
+    } else {
+        while (it_first != it_second && !comp_func(*it_first, A))
+            it_first++;
+
+        if (it_first == it_second)
+            return false;
+
+        while (it_first != it_second) {
+            if (!comp_func(*it_first, A))
+                return false;
+            it_first++;
+        }
+    }
+
+    return true;
 }
 
 template<class Iterator, class T>
 T find_not(Iterator it_first, Iterator it_second, T elem) {
     while (it_first != it_second) {
+        if (*it_first != elem)
+            return *it_first;
         it_first++;
-        if (*prev(it_first) != elem)
-            return *prev(it_first);
     }
+
+    return -1;
 }
 
 template<class Iterator, class T>
 T find_backward(Iterator it_first, Iterator it_second, T elem) {
+    it_second--;
     while (it_second != it_first) {
+        if (*it_second == elem)
+            return *it_second;
         it_second--;
-        if (*next(it_first) == elem)
-            return *next(it_first);
     }
+
+    if (it_first == it_second-- && *it_first == elem)
+        return *it_first;
+
+    return -1;
+
 }
 
 template<class Iterator, class T>
-bool is_palindrome() {
+bool is_palindrome(Iterator it_first, Iterator it_second, bool (&comp_func)(T, T)) {
+    it_second--;
+    while (it_first != it_second) {
+        if (!comp_func(*it_first, *it_second))
+            return false;
 
+        if ((it_first + 1) == it_second)
+            break;
+
+        it_first++;
+        it_second--;
+    }
+
+    return true;
 }
 
 int main() {
 
-    vector<int> vec = {3, 3, 3, 2};
+    vector<int> vec = {1, 2, 5};
+    set<int> set = {2, 1, 2, 0};
+
+    cout << all_of(set.begin(), set.end(), 3, my_less<int>) << "\n";
+
+    cout << any_of(vec.begin(), vec.end(), 3, my_less<int>) << "\n";
 
     cout << is_sorted(vec.begin(), vec.end(), my_greater<int>) << "\n";
 
@@ -126,6 +205,10 @@ int main() {
     cout << find_not(vec.begin(), vec.end(), 3) << "\n";
 
     cout << find_backward(vec.begin(), vec.end(), 3) << "\n";
+
+    cout << is_partitioned(vec.begin(), vec.end(), 4, my_less_equal<int>) << "\n";
+
+    cout << is_palindrome(vec.begin(), vec.end(), my_parity<int>) << "\n";
 
     return 0;
 }
