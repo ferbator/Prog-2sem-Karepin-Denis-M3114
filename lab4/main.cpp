@@ -211,31 +211,33 @@ bool is_partitioned(Iterator it_first, Iterator it_second, T elem, bool (&comp_f
 }
 
 template<class Iterator, class T>
-void find_not(Iterator it_first, Iterator it_second, T elem) {
+Iterator find_not(Iterator it_first, Iterator it_second, T elem) {
     while (it_first != it_second) {
         if (*it_first != elem) {
-            cout << *it_first;
-            break;
+            return it_first;
         }
         it_first++;
     }
+
+    return it_second;
 }
 
 template<class Iterator, class T>
-void find_backward(Iterator it_first, Iterator it_second, T elem) {
+Iterator find_backward(Iterator it_first, Iterator it_second, T elem) {
     it_second--;
+    Iterator end = it_second;
     while (it_second != it_first) {
         if (*it_second == elem) {
-            cout << *it_second;
-            break;
+            return it_second;
         }
         it_second--;
     }
 
-    if (it_first == it_second-- && *it_first == elem) {
-        cout << *it_first;
+    if (it_first == it_second && *it_first == elem) {
+        return it_first;
     }
 
+    return end;
 }
 
 template<class Iterator, class T>
@@ -274,11 +276,9 @@ int main() {
 
     cout << is_sorted(vec.begin(), vec.end(), my_less<int>) << "\n";
 
-    find_not(vec.begin(), vec.end(), 3);
-    cout << "\n";
+    cout << *find_not(vec.begin(), vec.end(), 3) << "\n";
 
-    find_backward(vec.begin(), vec.end(), 3);
-    cout << "\n";
+    cout << *find_backward(vec.begin(), vec.end(), 3) << "\n";
 
     cout << is_partitioned(vec.begin(), vec.end(), 4, my_less_equal<int>) << "\n";
 
