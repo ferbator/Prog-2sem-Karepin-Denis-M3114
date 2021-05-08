@@ -58,7 +58,7 @@ public:
 
 ostream &operator<<(ostream &out, const CPoint &p) {
     out << p.get_x() << " " << p.get_y();
-    
+
     return out;
 }
 
@@ -99,6 +99,13 @@ bool my_less_equal(type a, type b) {
 template<typename type>
 bool my_equal_to(type a, type b) {
     if (a == b)
+        return true;
+    return false;
+}
+
+template<typename type>
+bool my_not_equal_to(type a, type b) {
+    if (a != b)
         return true;
     return false;
 }
@@ -278,7 +285,6 @@ int main() {
     cout << is_palindrome(vec.begin(), vec.end(), my_parity<int>) << "\n";
 
     cout << is_palindrome(vec_point.begin(), vec_point.end(), my_equal_to<CPoint>) << "\n";
-
 
     return 0;
 }
