@@ -4,6 +4,64 @@
 
 using namespace std;
 
+class CPoint {
+private:
+    float y, x;
+public:
+    CPoint() : x(0), y(0) {}; // default constructor
+
+    CPoint(float x_, float y_) : x(x_), y(y_) {};
+
+    float get_x() const {
+        return x;
+    };
+
+    float get_y() const {
+        return y;
+    };
+
+    CPoint(const CPoint &t) : x(t.x), y(t.y) {}; // copy constructor
+
+    bool operator==(const CPoint &other) const {
+        if (this->x == other.x && this->y == other.y)
+            return true;
+        else
+            return false;
+    }
+
+    bool operator>(const CPoint &other) const {
+        if (this->x > other.x && this->y > other.y)
+            return true;
+        else
+            return false;
+    }
+
+    bool operator<(const CPoint &other) const {
+        if (this->x < other.x && this->y < other.y)
+            return true;
+        else
+            return false;
+    }
+
+    CPoint &operator=(const CPoint &other) {
+        if (&other == this)
+            return *this;
+
+        this->x = other.x;
+        this->y = other.y;
+
+        return *this;
+    }
+
+    ~CPoint() = default;
+};
+
+ostream &operator<<(ostream &out, const CPoint &p) {
+    out << p.get_x() << " " << p.get_y();
+    
+    return out;
+}
+
 //место для предикатов
 /*
     equal_to бинарный предикат равенства
@@ -113,30 +171,30 @@ bool is_sorted(Iterator it_first, Iterator it_second, bool (&comp_func)(T, T)) {
 }
 
 template<class Iterator, class T>
-bool is_partitioned(Iterator it_first, Iterator it_second, T A, bool (&comp_func)(T, T)) {
+bool is_partitioned(Iterator it_first, Iterator it_second, T elem, bool (&comp_func)(T, T)) {
     int count = 0;
-    if (comp_func(*it_first, A)) {
-        while (it_first != it_second && comp_func(*it_first, A))
+    if (comp_func(*it_first, elem)) {
+        while (it_first != it_second && comp_func(*it_first, elem))
             it_first++;
 
         if (it_first == it_second)
             return false;
 
         while (it_first != it_second) {
-            if (comp_func(*it_first, A))
+            if (comp_func(*it_first, elem))
                 return false;
             it_first++;
             count++;
         }
     } else {
-        while (it_first != it_second && !comp_func(*it_first, A))
+        while (it_first != it_second && !comp_func(*it_first, elem))
             it_first++;
 
         if (it_first == it_second)
             return false;
 
         while (it_first != it_second) {
-            if (!comp_func(*it_first, A))
+            if (!comp_func(*it_first, elem))
                 return false;
             it_first++;
         }
@@ -146,29 +204,30 @@ bool is_partitioned(Iterator it_first, Iterator it_second, T A, bool (&comp_func
 }
 
 template<class Iterator, class T>
-T find_not(Iterator it_first, Iterator it_second, T elem) {
+void find_not(Iterator it_first, Iterator it_second, T elem) {
     while (it_first != it_second) {
-        if (*it_first != elem)
-            return *it_first;
+        if (*it_first != elem) {
+            cout << *it_first;
+            break;
+        }
         it_first++;
     }
-
-    return -1;
 }
 
 template<class Iterator, class T>
-T find_backward(Iterator it_first, Iterator it_second, T elem) {
+void find_backward(Iterator it_first, Iterator it_second, T elem) {
     it_second--;
     while (it_second != it_first) {
-        if (*it_second == elem)
-            return *it_second;
+        if (*it_second == elem) {
+            cout << *it_second;
+            break;
+        }
         it_second--;
     }
 
-    if (it_first == it_second-- && *it_first == elem)
-        return *it_first;
-
-    return -1;
+    if (it_first == it_second-- && *it_first == elem) {
+        cout << *it_first;
+    }
 
 }
 
@@ -192,9 +251,15 @@ bool is_palindrome(Iterator it_first, Iterator it_second, bool (&comp_func)(T, T
 int main() {
 
     vector<int> vec = {1, 2, 5};
+    CPoint a(2, 3);
+    CPoint b(3, 4);
+    CPoint c(2, 3);
+    vector<CPoint> vec_point = {a, b, c};
     set<int> set = {2, 1, 2, 0};
 
     cout << all_of(set.begin(), set.end(), 3, my_less<int>) << "\n";
+    CPoint d(2, 3);
+    cout << all_of(vec_point.begin(), vec_point.end(), d, my_less<CPoint>) << "\n";
 
     cout << any_of(vec.begin(), vec.end(), 3, my_less<int>) << "\n";
 
@@ -202,13 +267,18 @@ int main() {
 
     cout << is_sorted(vec.begin(), vec.end(), my_less<int>) << "\n";
 
-    cout << find_not(vec.begin(), vec.end(), 3) << "\n";
+    find_not(vec.begin(), vec.end(), 3);
+    cout << "\n";
 
-    cout << find_backward(vec.begin(), vec.end(), 3) << "\n";
+    find_backward(vec.begin(), vec.end(), 3);
+    cout << "\n";
 
     cout << is_partitioned(vec.begin(), vec.end(), 4, my_less_equal<int>) << "\n";
 
     cout << is_palindrome(vec.begin(), vec.end(), my_parity<int>) << "\n";
+
+    cout << is_palindrome(vec_point.begin(), vec_point.end(), my_equal_to<CPoint>) << "\n";
+
 
     return 0;
 }
