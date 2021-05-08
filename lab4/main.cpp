@@ -64,15 +64,12 @@ ostream &operator<<(ostream &out, const CPoint &p) {
 
 //место для предикатов
 /*
-    equal_to бинарный предикат равенства
-    not_equal_to бинарный предикат неравенства
+    equal_to бинарный предикат равенства ==
+    not_equal_to бинарный предикат неравенства !=
     greater бинарный предикат >
-    less бинарный предикат < (используется по умолчанию)
+    less бинарный предикат <
     greater_equal бинарный предикат >=
     less_equal бинарный предикат <=
-    logical_and бинарный предикат И
-    logical_or бинарный предикат ИЛИ
-    logical_not унарный предикат НЕ
  */
 
 template<typename type>
