@@ -1,6 +1,7 @@
 #include <iostream>
 #include <cmath>
 #include <vector>
+#include <string>
 
 using namespace std;
 
@@ -156,7 +157,7 @@ public:
         if (k)
             for (int i = 0; i < n; i++)
                 vec.push_back(m[i]);
-        else throw "Wrong polygon";
+        else throw string("Wrong polygon");
     };
 
     CPolygon(vector<CPoint> &m) {
@@ -217,7 +218,7 @@ public:
 
     CTriangle(CPoint m[], int n) : CPolygon(m, n) {
         if (n != 3 || On_one_straight_line())
-            throw "Wrong triangle";
+            throw string("Wrong triangle");
     };
 
     CTriangle(CTriangle &other) : CPolygon(other.vec) {};
@@ -264,7 +265,7 @@ public:
 
     CTrapezoid(CPoint m[], int n) : CPolygon(m, n) {
         if (!IsTrapezoid())
-            throw "Wrong trapezoid";
+            throw string("Wrong trapezoid");
     };
 
     CTrapezoid(vector<CPoint> &m) : CPolygon(m) {};
