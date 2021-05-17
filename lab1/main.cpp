@@ -1,5 +1,5 @@
 #include <iostream>
-#include <math.h>
+#include <cmath>
 #include <vector>
 
 using namespace std;
@@ -38,14 +38,14 @@ public:
         cout << "Point: (" << x << ", " << y << ")\n";
     };
 
-    float PointToPoint(CPoint &a, CPoint &b) {
+    static float PointToPoint(CPoint &a, CPoint &b) {
         return sqrt(pow(a.get_x() - b.get_x(), 2) + pow(a.get_y() - b.get_y(), 2));
     };
 
-    ~CPoint() {}
+    ~CPoint() = default;
 };
 
-class CPolyline : public CPoint {
+class CPolyline {
 protected:
     vector<CPoint> vec;
     float length = 0.0;
@@ -71,7 +71,7 @@ public:
 
     float getLength() {
         for (int i = 0; i < vec.size() - 1; i++)
-            length += PointToPoint(vec[i], vec[i + 1]);
+            length += CPoint::PointToPoint(vec[i], vec[i + 1]);
 
         return length;
     };
@@ -85,7 +85,7 @@ public:
         return *this;
     };
 
-    ~CPolyline() {}
+    ~CPolyline() = default;
 };
 
 class CPolyline_closed : public CPolyline {
@@ -102,8 +102,8 @@ public:
 
     float perimeter() {
         for (int i = 0; i < vec.size() - 1; i++)
-            perimeter_ += PointToPoint(vec[i], vec[i + 1]);
-        perimeter_ += PointToPoint(vec[0], vec[vec.size() - 1]);
+            perimeter_ += CPoint::PointToPoint(vec[i], vec[i + 1]);
+        perimeter_ += CPoint::PointToPoint(vec[0], vec[vec.size() - 1]);
 
         return perimeter_;
     };
@@ -117,7 +117,7 @@ public:
         return *this;
     };
 
-    ~CPolyline_closed() {}
+    ~CPolyline_closed() = default;
 };
 
 class CPolygon : public CPoint {
@@ -158,8 +158,7 @@ public:
         if (k)
             for (int i = 0; i < n; i++)
                 vec.push_back(m[i]);
-        else throw -1;
-        //exit(0);
+        else throw "Wrong polygon";
     };
 
     CPolygon(vector<CPoint> &m) {
@@ -201,7 +200,7 @@ public:
         return *this;
     };
 
-    ~CPolygon() {}
+    ~CPolygon() = default;
 };
 
 class CTriangle : public CPolygon {
@@ -220,8 +219,7 @@ public:
 
     CTriangle(CPoint m[], int n) : CPolygon(m, n) {
         if (n != 3 || On_one_straight_line())
-            throw -1;
-        //exit(0);
+            throw "Wrong triangle";
     };
 
     CTriangle(CTriangle &other) : CPolygon(other.vec) {};
@@ -248,7 +246,7 @@ public:
         return *this;
     };
 
-    ~CTriangle() {}
+    ~CTriangle() = default;
 };
 
 class CTrapezoid : public CPolygon {
@@ -268,7 +266,7 @@ public:
 
     CTrapezoid(CPoint m[], int n) : CPolygon(m, n) {
         if (!IsTrapezoid())
-            throw -1;
+            throw "Wrong trapezoid";
     };
 
     CTrapezoid(vector<CPoint> &m) : CPolygon(m) {};
@@ -297,20 +295,18 @@ public:
         return *this;
     };
 
-    ~CTrapezoid() {}
+    ~CTrapezoid() = default;
 };
 
 class CPolygon_regular : public CPolygon {
-private:
-
 public:
     CPolygon_regular() {};
 
     CPolygon_regular(CPoint m[], int n) : CPolygon(m, n) {};
 
-    CPolygon_regular(vector<CPoint> &m) : CPolygon(m) {};
+    explicit CPolygon_regular(vector<CPoint> &m) : CPolygon(m) {};
 
-    CPolygon_regular(CPolygon &p) : CPolygon(p) {};
+    explicit CPolygon_regular(CPolygon &p) : CPolygon(p) {};
 
     float square() override {
         float a = PointToPoint(vec[0], vec[1]);
@@ -327,7 +323,7 @@ public:
         return *this;
     };
 
-    ~CPolygon_regular() {}
+    ~CPolygon_regular() = default;
 };
 
 int main() {
